@@ -522,7 +522,7 @@ under the License.
                 <artifactId>maven-thrift-plugin</artifactId>
                 <version>0.1.11</version>
                 <configuration>
-                    <thriftExecutable>${starrocks.thridparty}/installed/bin/thrift</thriftExecutable>
+                    <thriftExecutable>/usr/local/Cellar/thrift@0.13.0/0.13.0/bin/thrift</thriftExecutable>
                     <thriftSourceRoot>${starrocks.home}/gensrc/thrift</thriftSourceRoot>
                     <generator>java</generator>
                 </configuration>

@@ -39,97 +39,101 @@ import java.util.Map;
 public class Log4jConfig extends XmlConfiguration {
     private static final long serialVersionUID = 1L;
 
-    private static String xmlConfTemplate = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
-            "\n" +
-            "<Configuration status=\"info\" packages=\"com.starrocks.common\">\n" +
-            "  <Appenders>\n" +
-            "    <RollingFile name=\"Sys\" fileName=\"${sys_log_dir}/fe.log\" filePattern=\"${sys_log_dir}/fe.log.${sys_file_pattern}-%i\">\n" +
-            "      <PatternLayout charset=\"UTF-8\">\n" +
-            "        <Pattern>%d{yyyy-MM-dd HH:mm:ss,SSS} %p (%t|%tid) [%C{1}.%M():%L] %m%n</Pattern>\n" +
-            "      </PatternLayout>\n" +
-            "      <Policies>\n" +
-            "        <TimeBasedTriggeringPolicy/>\n" +
-            "        <SizeBasedTriggeringPolicy size=\"${sys_roll_maxsize}MB\"/>\n" +
-            "      </Policies>\n" +
-            "      <DefaultRolloverStrategy max=\"${sys_roll_num}\" fileIndex=\"min\">\n" +
-            "        <Delete basePath=\"${sys_log_dir}/\" maxDepth=\"1\">\n" +
-            "          <IfFileName glob=\"fe.log.*\" />\n" +
-            "          <IfLastModified age=\"${sys_log_delete_age}\" />\n" +
-            "        </Delete>\n" +
-            "      </DefaultRolloverStrategy>\n" +
-            "    </RollingFile>\n" +
-            "    <RollingFile name=\"SysWF\" fileName=\"${sys_log_dir}/fe.warn.log\" filePattern=\"${sys_log_dir}/fe.warn.log.${sys_file_pattern}-%i\">\n" +
-            "      <PatternLayout charset=\"UTF-8\">\n" +
-            "        <Pattern>%d{yyyy-MM-dd HH:mm:ss,SSS} %p (%t|%tid) [%C{1}.%M():%L] %m%n</Pattern>\n" +
-            "      </PatternLayout>\n" +
-            "      <Policies>\n" +
-            "        <TimeBasedTriggeringPolicy/>\n" +
-            "        <SizeBasedTriggeringPolicy size=\"${sys_roll_maxsize}MB\"/>\n" +
-            "      </Policies>\n" +
-            "      <DefaultRolloverStrategy max=\"${sys_roll_num}\" fileIndex=\"min\">\n" +
-            "        <Delete basePath=\"${sys_log_dir}/\" maxDepth=\"1\">\n" +
-            "          <IfFileName glob=\"fe.warn.log.*\" />\n" +
-            "          <IfLastModified age=\"${sys_log_delete_age}\" />\n" +
-            "        </Delete>\n" +
-            "      </DefaultRolloverStrategy>\n" +
-            "    </RollingFile>\n" +
-            "    <RollingFile name=\"Auditfile\" fileName=\"${audit_log_dir}/fe.audit.log\" filePattern=\"${audit_log_dir}/fe.audit.log.${audit_file_pattern}-%i\">\n" +
-            "      <PatternLayout charset=\"UTF-8\">\n" +
-            "        <Pattern>%d{yyyy-MM-dd HH:mm:ss,SSS} [%c{1}] %m%n</Pattern>\n" +
-            "      </PatternLayout>\n" +
-            "      <Policies>\n" +
-            "        <TimeBasedTriggeringPolicy/>\n" +
-            "        <SizeBasedTriggeringPolicy size=\"${audit_roll_maxsize}MB\"/>\n" +
-            "      </Policies>\n" +
-            "      <DefaultRolloverStrategy max=\"${sys_roll_num}\" fileIndex=\"min\">\n" +
-            "        <Delete basePath=\"${audit_log_dir}/\" maxDepth=\"1\">\n" +
-            "          <IfFileName glob=\"fe.audit.log.*\" />\n" +
-            "          <IfLastModified age=\"${audit_log_delete_age}\" />\n" +
-            "        </Delete>\n" +
-            "      </DefaultRolloverStrategy>\n" +
-            "    </RollingFile>\n" +
-            "    <RollingFile name=\"dumpFile\" fileName=\"${dump_log_dir}/fe.dump.log\" filePattern=\"${dump_log_dir}/fe.dump.log.${dump_file_pattern}-%i\">\n" +
-            "      <PatternLayout charset=\"UTF-8\">\n" +
-            "        <Pattern>%d{yyyy-MM-dd HH:mm:ss,SSS} [%c{1}] %m%n</Pattern>\n" +
-            "      </PatternLayout>\n" +
-            "      <Policies>\n" +
-            "        <TimeBasedTriggeringPolicy/>\n" +
-            "        <SizeBasedTriggeringPolicy size=\"${dump_roll_maxsize}MB\"/>\n" +
-            "      </Policies>\n" +
-            "      <DefaultRolloverStrategy max=\"${dump_roll_num}\" fileIndex=\"min\">\n" +
-            "        <Delete basePath=\"${dump_log_dir}/\" maxDepth=\"1\">\n" +
-            "          <IfFileName glob=\"fe.dump.log.*\" />\n" +
-            "          <IfLastModified age=\"${dump_log_delete_age}\" />\n" +
-            "        </Delete>\n" +
-            "      </DefaultRolloverStrategy>\n" +
-            "    </RollingFile>\n" +
-            "  </Appenders>\n" +
-            "  <Loggers>\n" +
-            "    <Root level=\"${sys_log_level}\">\n" +
-            "      <AppenderRef ref=\"Sys\"/>\n" +
-            "      <AppenderRef ref=\"SysWF\" level=\"WARN\"/>\n" +
-            "    </Root>\n" +
-            "    <Logger name=\"audit\" level=\"ERROR\" additivity=\"false\">\n" +
-            "      <AppenderRef ref=\"Auditfile\"/>\n" +
-            "    </Logger>\n" +
-            "    <Logger name=\"dump\" level=\"ERROR\" additivity=\"false\">\n" +
-            "      <AppenderRef ref=\"dumpFile\"/>\n" +
-            "    </Logger>\n" +
-            "    <Logger name=\"org.apache.thrift\" level=\"DEBUG\"> \n" +
-            "      <AppenderRef ref=\"Sys\"/>\n" +
-            "    </Logger>\n" +
-            "    <Logger name=\"org.apache.thrift.transport\" level=\"DEBUG\"> \n" +
-            "      <AppenderRef ref=\"Sys\"/>\n" +
-            "    </Logger>\n" +
-            "    <Logger name=\"com.starrocks.thrift\" level=\"DEBUG\"> \n" +
-            "      <AppenderRef ref=\"Sys\"/>\n" +
-            "    </Logger>\n" +
-            "    <Logger name=\"org.apache.kafka\" level=\"WARN\"> \n" +
-            "      <AppenderRef ref=\"SysWF\"/>\n" +
-            "    </Logger>\n" +
-            "    <!--REPLACED BY AUDIT AND VERBOSE MODULE NAMES-->\n" +
-            "  </Loggers>\n" +
-            "</Configuration>";
+    private static String xmlConfTemplate = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+                                            + "\n"
+                                            + "<Configuration status=\"info\" packages=\"com.starrocks.common\">\n"
+                                            + "  <Appenders>\n"
+                                            + "    <Console name=\"consolePrint\" target=\"SYSTEM_OUT\">\n"
+                                            + "      <PatternLayout pattern=\"%d{ISO8601}{GMT+8} %p [%t] %c - %m%n\"/>\n"
+                                            + "    </Console>\n"
+                                            + "    <RollingFile name=\"Sys\" fileName=\"/Users/didi/starrocks/starrocks/fe/log/fe.log\" filePattern=\"/Users/didi/starrocks/starrocks/fe/log/fe.log.%d{yyyyMMdd}-%i\">\n"
+                                            + "      <PatternLayout charset=\"UTF-8\">\n"
+                                            + "        <Pattern>%d{yyyy-MM-dd HH:mm:ss,SSS} %p (%t|%tid) [%C{1}.%M():%L] %m%n</Pattern>\n"
+                                            + "      </PatternLayout>\n"
+                                            + "      <Policies>\n"
+                                            + "        <TimeBasedTriggeringPolicy/>\n"
+                                            + "        <SizeBasedTriggeringPolicy size=\"1024MB\"/>\n"
+                                            + "      </Policies>\n"
+                                            + "      <DefaultRolloverStrategy max=\"10\" fileIndex=\"min\">\n"
+                                            + "        <Delete basePath=\"/Users/didi/starrocks/starrocks/fe/log/\" maxDepth=\"1\">\n"
+                                            + "          <IfFileName glob=\"fe.log.*\" />\n"
+                                            + "          <IfLastModified age=\"7d\" />\n"
+                                            + "        </Delete>\n"
+                                            + "      </DefaultRolloverStrategy>\n"
+                                            + "    </RollingFile>\n"
+                                            + "    <RollingFile name=\"SysWF\" fileName=\"/Users/didi/starrocks/starrocks/fe/log/fe.warn.log\" filePattern=\"/Users/didi/starrocks/starrocks/fe/log/fe.warn.log.%d{yyyyMMdd}-%i\">\n"
+                                            + "      <PatternLayout charset=\"UTF-8\">\n"
+                                            + "        <Pattern>%d{yyyy-MM-dd HH:mm:ss,SSS} %p (%t|%tid) [%C{1}.%M():%L] %m%n</Pattern>\n"
+                                            + "      </PatternLayout>\n"
+                                            + "      <Policies>\n"
+                                            + "        <TimeBasedTriggeringPolicy/>\n"
+                                            + "        <SizeBasedTriggeringPolicy size=\"1024MB\"/>\n"
+                                            + "      </Policies>\n"
+                                            + "      <DefaultRolloverStrategy max=\"10\" fileIndex=\"min\">\n"
+                                            + "        <Delete basePath=\"/Users/didi/starrocks/starrocks/fe/log/\" maxDepth=\"1\">\n"
+                                            + "          <IfFileName glob=\"fe.warn.log.*\" />\n"
+                                            + "          <IfLastModified age=\"7d\" />\n"
+                                            + "        </Delete>\n"
+                                            + "      </DefaultRolloverStrategy>\n"
+                                            + "    </RollingFile>\n"
+                                            + "    <RollingFile name=\"Auditfile\" fileName=\"/Users/didi/starrocks/starrocks/fe/log/fe.audit.log\" filePattern=\"/Users/didi/starrocks/starrocks/fe/log/fe.audit.log.%d{yyyyMMdd}-%i\">\n"
+                                            + "      <PatternLayout charset=\"UTF-8\">\n"
+                                            + "        <Pattern>%d{yyyy-MM-dd HH:mm:ss,SSS} [%c{1}] %m%n</Pattern>\n"
+                                            + "      </PatternLayout>\n"
+                                            + "      <Policies>\n"
+                                            + "        <TimeBasedTriggeringPolicy/>\n"
+                                            + "        <SizeBasedTriggeringPolicy size=\"1024MB\"/>\n"
+                                            + "      </Policies>\n"
+                                            + "      <DefaultRolloverStrategy max=\"10\" fileIndex=\"min\">\n"
+                                            + "        <Delete basePath=\"/Users/didi/starrocks/starrocks/fe/log/\" maxDepth=\"1\">\n"
+                                            + "          <IfFileName glob=\"fe.audit.log.*\" />\n"
+                                            + "          <IfLastModified age=\"30d\" />\n"
+                                            + "        </Delete>\n"
+                                            + "      </DefaultRolloverStrategy>\n"
+                                            + "    </RollingFile>\n"
+                                            + "    <RollingFile name=\"dumpFile\" fileName=\"/Users/didi/starrocks/starrocks/fe/log/fe.dump.log\" filePattern=\"/Users/didi/starrocks/starrocks/fe/log/fe.dump.log.%d{yyyyMMdd}-%i\">\n"
+                                            + "      <PatternLayout charset=\"UTF-8\">\n"
+                                            + "        <Pattern>%d{yyyy-MM-dd HH:mm:ss,SSS} [%c{1}] %m%n</Pattern>\n"
+                                            + "      </PatternLayout>\n"
+                                            + "      <Policies>\n"
+                                            + "        <TimeBasedTriggeringPolicy/>\n"
+                                            + "        <SizeBasedTriggeringPolicy size=\"1024MB\"/>\n"
+                                            + "      </Policies>\n"
+                                            + "      <DefaultRolloverStrategy max=\"10\" fileIndex=\"min\">\n"
+                                            + "        <Delete basePath=\"/Users/didi/starrocks/starrocks/fe/log/\" maxDepth=\"1\">\n"
+                                            + "          <IfFileName glob=\"fe.dump.log.*\" />\n"
+                                            + "          <IfLastModified age=\"7d\" />\n"
+                                            + "        </Delete>\n"
+                                            + "      </DefaultRolloverStrategy>\n"
+                                            + "    </RollingFile>\n"
+                                            + "  </Appenders>\n"
+                                            + "  <Loggers>\n"
+                                            + "    <Root level=\"DEBUG\">\n"
+                                            + "      <AppenderRef ref=\"consolePrint\"/>\n"
+                                            + "      <AppenderRef ref=\"Sys\"/>\n"
+                                            + "      <AppenderRef ref=\"SysWF\" level=\"WARN\"/>\n"
+                                            + "    </Root>\n"
+                                            + "    <Logger name=\"audit\" level=\"ERROR\" additivity=\"false\">\n"
+                                            + "      <AppenderRef ref=\"Auditfile\"/>\n"
+                                            + "    </Logger>\n"
+                                            + "    <Logger name=\"dump\" level=\"ERROR\" additivity=\"false\">\n"
+                                            + "      <AppenderRef ref=\"dumpFile\"/>\n"
+                                            + "    </Logger>\n"
+                                            + "    <Logger name=\"org.apache.thrift\" level=\"DEBUG\"> \n"
+                                            + "      <AppenderRef ref=\"Sys\"/>\n"
+                                            + "    </Logger>\n"
+                                            + "    <Logger name=\"org.apache.thrift.transport\" level=\"DEBUG\"> \n"
+                                            + "      <AppenderRef ref=\"Sys\"/>\n"
+                                            + "    </Logger>\n"
+                                            + "    <Logger name=\"com.starrocks.thrift\" level=\"DEBUG\"> \n"
+                                            + "      <AppenderRef ref=\"Sys\"/>\n"
+                                            + "    </Logger>\n"
+                                            + "    <Logger name=\"org.apache.kafka\" level=\"WARN\"> \n"
+                                            + "      <AppenderRef ref=\"SysWF\"/>\n"
+                                            + "    </Logger>\n"
+                                            + "    <Logger name='audit.slow_query' level='INFO'/><Logger name='audit.query' level='INFO'/><Logger name='dump.query' level='INFO'/>\n"
+                                            + "  </Loggers>\n"
+                                            + "</Configuration>";
 
     private static StrSubstitutor strSub;
     private static String sysLogLevel;
